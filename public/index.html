@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>Stock Compass</title>
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="launch-warning hidden" id="launchWarning">
+        <strong>데이터 연결 확인이 필요합니다</strong>
+        <p>인터넷 연결이나 금융 데이터 제공 경로가 잠시 막히면 임시 분석만 표시될 수 있습니다.</p>
+      </section>
+
+      <section class="loading-panel hidden" id="loadingPanel" aria-live="polite">
+        <div class="hourglass" aria-hidden="true">⏳</div>
+        <div>
+          <strong id="loadingTitle">실제 가격을 불러오는 중</strong>
+          <p id="loadingText">여러 데이터 경로 중 가장 빠른 연결을 찾고 있습니다.</p>
+        </div>
+      </section>
+
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">AI Assisted Forecast</p>
+          <h1>Stock Compass</h1>
+        </div>
+        <button class="icon-button" id="installButton" type="button" title="앱 설치" aria-label="앱 설치">
+          <span>+</span>
+        </button>
+      </section>
+
+      <section class="market-strip" aria-label="시장 요약">
+        <div>
+          <span>데이터</span>
+          <strong id="dataMode">연결 중</strong>
+        </div>
+        <div>
+          <span>분석 기간</span>
+          <strong id="sampleSize">-</strong>
+        </div>
+        <div>
+          <span>최근 종가</span>
+          <strong id="latestPrice">-</strong>
+        </div>
+      </section>
+
+      <div class="screen" id="forecastScreen">
+        <section class="input-panel">
+          <label for="symbolInput">회사명 또는 종목</label>
+          <div class="symbol-row">
+            <input id="symbolInput" type="text" value="Apple" maxlength="32" autocomplete="off" />
+            <button id="analyzeButton" type="button">분석</button>
+          </div>
+          <div class="quick-picks" aria-label="인기 종목">
+            <button type="button" data-pick="NVIDIA">NVIDIA</button>
+            <button type="button" data-pick="Intel">Intel</button>
+            <button type="button" data-pick="Tesla">Tesla</button>
+            <button type="button" data-pick="Apple">Apple</button>
+            <button type="button" data-pick="Microsoft">Microsoft</button>
+          </div>
+          <p class="helper-text" id="dataStatus">종목 코드를 넣으면 최신 일별 가격을 자동으로 불러옵니다.</p>
+        </section>
+
+        <section class="forecast-panel">
+          <div class="forecast-header">
+            <div>
+              <p class="eyebrow" id="asOfDate">최근 데이터 기준</p>
+              <h2 id="resultSymbol">AAPL</h2>
+            </div>
+            <span class="badge" id="confidenceBadge">56%</span>
+          </div>
+          <div class="meter" aria-label="상승 확률">
+            <div id="meterFill"></div>
+          </div>
+          <div class="forecast-copy">
+            <p id="directionText">상승 쪽으로 약간 기운 신호입니다.</p>
+            <p id="priceText">$0.00 기준</p>
+          </div>
+          <button class="secondary-action" id="saveWatchButton" type="button">관심종목 저장</button>
+        </section>
+
+        <section class="tabs" aria-label="상세 분석">
+          <button class="tab active" data-tab="signals" type="button">신호</button>
+          <button class="tab" data-tab="risks" type="button">리스크</button>
+          <button class="tab" data-tab="backtest" type="button">검증</button>
+        </section>
+
+        <section class="detail-panel" id="signalsPanel">
+          <ul id="signalsList"></ul>
+        </section>
+
+        <section class="detail-panel hidden" id="risksPanel">
+          <ul id="risksList"></ul>
+        </section>
+
+        <section class="detail-panel hidden" id="backtestPanel">
+          <div class="stat-grid">
+            <div>
+            <span>최근 검증 결과</span>
+            <strong id="hitRate">-</strong>
+          </div>
+          <div>
+            <span>예상 흔들림</span>
+            <strong id="volatility">-</strong>
+          </div>
+        </div>
+        <p class="muted" id="methodSummary">과거 데이터를 한 칸씩 가려가며 같은 방식으로 예측해 본 결과입니다.</p>
+      </section>
+      </div>
+
+      <section class="screen hidden" id="priceScreen">
+        <div class="section-title">
+          <p class="eyebrow">Price History</p>
+          <h2>주가</h2>
+        </div>
+        <div class="detail-panel">
+          <canvas id="priceChart" width="760" height="360" aria-label="최근 주가 차트"></canvas>
+          <div class="stat-grid price-stats">
+            <div>
+              <span>최근 1개월</span>
+              <strong id="monthChange">-</strong>
+            </div>
+            <div>
+              <span>최근 3개월</span>
+              <strong id="quarterChange">-</strong>
+            </div>
+          </div>
+          <ul class="price-list" id="priceList"></ul>
+        </div>
+      </section>
+
+      <section class="screen hidden" id="newsScreen">
+        <div class="section-title">
+          <p class="eyebrow">Market News</p>
+          <h2>뉴스</h2>
+        </div>
+        <div class="detail-panel">
+          <p class="helper-text" id="newsStatus">분석한 종목의 최신 뉴스를 불러옵니다.</p>
+          <ul class="news-list" id="newsList"></ul>
+        </div>
+      </section>
+
+      <section class="screen hidden" id="watchScreen">
+        <div class="section-title">
+          <p class="eyebrow">Portfolio Watch</p>
+          <h2>관심종목</h2>
+        </div>
+        <div class="detail-panel">
+          <ul class="symbol-list" id="watchList"></ul>
+        </div>
+      </section>
+
+      <section class="screen hidden" id="alertsScreen">
+        <div class="section-title">
+          <p class="eyebrow">Signal Alerts</p>
+          <h2>알림 조건</h2>
+        </div>
+        <div class="input-panel">
+          <label for="alertThreshold">상승 확률 기준</label>
+          <input id="alertThreshold" type="range" min="45" max="75" value="60" />
+          <div class="threshold-row">
+            <strong id="thresholdValue">60%</strong>
+            <span class="muted">기준 이상이면 관심종목 화면에 표시</span>
+          </div>
+        </div>
+        <div class="detail-panel">
+          <ul id="alertList"></ul>
+        </div>
+      </section>
+
+      <nav class="bottom-nav" aria-label="앱 메뉴">
+        <button class="nav-item active" data-screen="forecast" type="button">전망</button>
+        <button class="nav-item" data-screen="price" type="button">주가</button>
+        <button class="nav-item" data-screen="news" type="button">뉴스</button>
+        <button class="nav-item" data-screen="watch" type="button">관심</button>
+        <button class="nav-item" data-screen="alerts" type="button">알림</button>
+      </nav>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

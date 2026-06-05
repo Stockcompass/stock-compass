@@ -1,0 +1,26 @@
+DEPLOY EXACTLY THIS FOLDER
+
+Upload these root items to GitHub:
+- api
+- public
+- README.md
+- UPLOAD_STEPS.md
+- DEPLOY_CHECKLIST.txt
+- vercel.json
+
+Do NOT upload or keep these at the repository root:
+- app.js
+- index.html
+- styles.css
+- server.js
+- package.json
+- manifest.json
+- sw.js
+- icon.svg
+
+After Vercel deploys, verify these URLs:
+- /
+- /api/prices?symbol=AAPL
+- /api/prices?symbol=INTC
+- /api/news?symbol=NVDA
+- /audit-runner.html
